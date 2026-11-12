@@ -132,7 +132,7 @@ ol.small li{margin:4px 0}
       <button class="choice" data-v="igual"><span class="dot" style="background:var(--meh)"></span>No me parece relevante</button>
     </div>
   </div>
-  <div class="qnav"><button class="linkbtn" id="back" type="button">← Anterior</button><span class="small muted" style="text-align:right">Puedes volver y cambiar tu respuesta</span></div>
+  <div class="qnav"><button class="linkbtn" id="back" type="button">← Anterior</button><span class="small muted" id="backhint" style="text-align:right">Puedes volver y cambiar tu respuesta</span></div>
 </section>
 
 <section id="s-results" class="hidden">
@@ -1011,6 +1011,7 @@ function render() {
   document.querySelectorAll('.choice').forEach(c => c.classList.toggle('sel', votes[m.id] === c.dataset.v));
   if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
   $('#back').textContent = i === 0 ? '← Volver a la introducción' : '← Anterior';
+  $('#backhint').style.visibility = i === 0 ? 'hidden' : 'visible';
 }
 function go(dir) {
   const card = $('#qcard'); $('#choices').classList.add('lock');
