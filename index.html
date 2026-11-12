@@ -1,42 +1,1114 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Dato mata relato</title>
-<meta name="description" content="Propuestas que se quedaron por el camino en la XV legislatura. Decide sin saber quién las propuso y mira después los datos.">
+<meta name="description" content="Propuestas que se quedaron por el camino en la legislatura 2023-2026. Decide si las habrías apoyado sin saber quién las propuso, y luego mira los datos.">
+<meta property="og:title" content="Dato mata relato">
+<meta property="og:description" content="Propuestas que se quedaron por el camino en la legislatura 2023-2026. Decide sin saber quién las propuso; luego, los datos.">
 <style>
-:root{--bg:#f6f3ee;--card:#fff;--ink:#1d1b18;--muted:#6b665e;--line:#e3ddd3}
+:root{
+  --serif:Georgia,"Times New Roman",serif; --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --bg:#f6f3ee; --card:#fff; --ink:#1d1b18; --muted:#6b665e; --line:#e3ddd3;
+  --gob:#c2410c; --opo:#1d4ed8; --yes:#15803d; --no:#b91c1c; --meh:#78716c; --accent:#111;
+}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 var(--sans)}
 .wrap{max-width:720px;margin:0 auto;padding:28px 18px 60px}
-h1{font-family:Georgia,"Times New Roman",serif;font-size:clamp(2.2rem,6vw,3.4rem);font-weight:800;letter-spacing:-.02em;line-height:1.15;margin:0 0 .4em}
+h1,h2,h3{font-family:var(--serif);line-height:1.15;margin:0 0 .4em}
+h1{font-size:clamp(2.2rem,6vw,3.4rem);font-weight:800;letter-spacing:-.02em}
 h1 span{text-decoration:line-through;text-decoration-thickness:4px;color:var(--muted)}
+h2{font-size:1.6rem}
+h3{font-size:1.25rem;font-weight:700;margin-top:0}
+#summary h3{margin-top:22px}
 p{margin:.4em 0 1em}
-.small{font-size:.86rem}
 .muted{color:var(--muted)}
-.quotes{font-family:Georgia,"Times New Roman",serif;font-size:1.2rem;line-height:1.35;border-left:3px solid var(--ink);padding-left:12px;margin:0 0 1em}
-.quotes p{margin:.2em 0}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;margin:24px 0}
-.card strong{font-family:Georgia,"Times New Roman",serif;font-size:1.35rem}
+.small{font-size:.86rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;margin:16px 0}
+.btn{appearance:none;border:1.5px solid var(--accent);background:var(--accent);color:#fff;border-radius:999px;padding:12px 22px;font:600 1rem var(--sans);cursor:pointer}
+.btn.ghost{background:transparent;color:var(--accent)}
+.btn:focus-visible,.choice:focus-visible,.opt:focus-visible{outline:3px solid #f59e0b;outline-offset:2px}
+.choices{display:grid;gap:10px;margin-top:18px}
+.choice{display:flex;align-items:center;gap:12px;border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:14px 16px;font:500 1rem var(--sans);text-align:left;cursor:pointer;color:var(--ink)}
+@media (hover:hover){.choice:hover{border-color:var(--ink)}}
+.choice.sel{border-color:var(--ink);background:#f3f0ea;font-weight:600}
+.choices.lock{pointer-events:none}
+#qcard{transition:opacity .22s ease, transform .22s ease}
+#qcard.out{opacity:0;transform:translateX(-18px)}
+#qcard.in{opacity:0;transform:translateX(18px)}
+.qnav{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+.linkbtn{white-space:nowrap;appearance:none;background:none;border:0;padding:6px 0;font:500 .95rem var(--sans);color:var(--ink);text-decoration:underline;cursor:pointer}
+.linkbtn[disabled]{opacity:.35;cursor:default}
+.ctx{background:#f6f3ee;border-radius:10px;padding:10px 12px;margin-top:10px}
+table.parties{width:100%;border-collapse:collapse;font-size:.95rem}
+table.parties th,table.parties td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left}
+table.parties td.n,table.parties th.n{text-align:center;width:28%}
+.legend p{margin:.35em 0}
+.choice .dot{width:12px;height:12px;border-radius:50%;flex:none}
+.length{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}
+.length .opt{border:1.5px solid var(--line);border-radius:12px;padding:12px 16px;background:#fff;cursor:pointer;font:500 .95rem var(--sans);color:var(--ink)}
+.length .opt[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.progress{height:6px;background:var(--line);border-radius:9px;overflow:hidden;margin:6px 0 18px}
+.progress i{display:block;height:100%;background:var(--ink);transition:width .3s}
+.measure{font-family:var(--serif);font-size:1.45rem;font-weight:600;line-height:1.3;margin:6px 0 14px}
+.tradeoff{border-left:3px solid var(--line);padding:4px 0 4px 12px;color:var(--muted);font-size:.95rem}
+.tag{display:inline-block;font-size:.78rem;font-weight:600;padding:3px 8px;border-radius:6px;background:#eee;color:#444;margin:0 4px 4px 0}
+.tag.gob{background:#ffedd5;color:var(--gob)} .tag.opo{background:#dbeafe;color:var(--opo)}
+.tag.vot{background:#fee2e2;color:#991b1b} .tag.mesa{background:#ede9fe;color:#5b21b6} .tag.vet{background:#e0f2fe;color:#075985}
+.quotes{font-family:var(--serif);font-size:1.2rem;line-height:1.35;border-left:3px solid var(--ink);padding-left:12px;margin:0 0 1em}.quotes p{margin:.2em 0}
+.tag.warn{background:#fef3c7;color:#92400e}
+.row{display:grid;grid-template-columns:150px 1fr 70px;gap:10px;align-items:center;margin:7px 0;font-size:.9rem}
+.row .track{height:12px;background:var(--line);border-radius:6px;overflow:hidden}
+.row .track i{display:block;height:100%;background:var(--ink)}
+.row .n{text-align:right;color:var(--muted)}
+.bar{display:flex;height:28px;border-radius:8px;overflow:hidden;background:var(--line);margin:6px 0}
+.bar div{display:flex;align-items:center;justify-content:center;color:#fff;font-size:.8rem;font-weight:600;white-space:nowrap;padding:0 6px}
+.reveal{border-top:1px solid var(--line);padding:16px 0}
+.reveal:first-child{border-top:0;padding-top:0}
+.reveal p{margin:.3em 0}
+.reveal .you{font-weight:600}
+a{color:inherit}
+.explainer{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:560px){.explainer{grid-template-columns:1fr}.row{grid-template-columns:96px 1fr 60px}}
+.mrow{display:grid;grid-template-columns:1fr auto;gap:4px 12px;padding:10px 0;border-top:1px solid var(--line)}
+.mrow:first-of-type{border-top:0}
+.mrow .t{font-weight:600}
+.mrow .who{grid-column:1/-1;font-size:.85rem;color:var(--muted)}
+.steps{list-style:none;padding:0;margin:12px 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;counter-reset:st}
+.steps li{counter-increment:st;background:#fff;border:1px solid #e3ddd2;border-radius:10px;padding:10px 12px;font-size:.9rem;line-height:1.4}
+.steps li::before{content:counter(st);display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:var(--ink);color:#fff;font-size:.75rem;font-weight:700;margin-right:6px}
+.steps b{display:inline}
+.chip{display:inline-block;padding:2px 9px;border-radius:999px;font-size:.78rem;font-weight:600;border:1px solid #cfc8bc;margin:2px 3px 2px 0;color:var(--ink);background:#fff}
+.chip.p{background:var(--ink);color:#fff;border-color:var(--ink)}
+.vermas{color:var(--ink);text-decoration:underline;white-space:nowrap}
+details[open] .vermas{display:none}
+.lead{font-family:var(--serif);font-size:1.35rem;line-height:1.3;margin:0 0 .6em}
+.hidden{display:none}
+ol.small li{margin:4px 0}
 </style>
 </head>
 <body>
 <div class="wrap">
+
+<section id="s-start">
   <p class="small muted">XV legislatura (2023-2026)</p>
   <h1>Dato mata <span>relato</span></h1>
   <div class="quotes">
     <p>«El Gobierno no ha hecho nada.»</p>
-    <p>«La oposición lo bloquea todo.»</p>
-    <p>«Nos han frenado todas nuestras propuestas.»</p>
+    <p>«La oposición lo ha bloqueado todo.»</p>
+    <p>«Nos frenaron todas nuestras propuestas.»</p>
   </div>
-  <p>Seguro que has oído o has dicho alguna de estas frases. Todas tienen algo de verdad y algo de exageración.</p>
-  <p>Aquí verás propuestas concretas que se quedaron por el camino en la última legislatura, sin saber quién las propuso. Tendrás que decidir si las habrías apoyado o no. Al final verás los datos: quién propuso cada una y quién la frenó.</p>
-  <p>No es un test para saber a qué partido te pareces ni a quién votar. El objetivo es fijarse en las medidas, no en las siglas.</p>
+  <p>¿Has oído o has dicho alguna de estas frases? Todas tienen parte de verdad. Ninguna cuenta toda la historia.</p>
+  <p>Aquí verás propuestas concretas que se quedaron por el camino en la última legislatura, sin saber quién las propuso. <strong>Tú decides qué te parece cada una. También vale dudar.</strong></p>
+  <p>Al final verás los datos: quién propuso cada una y quién la frenó.</p>
+  <p>No es un test para saber a qué partido te pareces ni a quién votar. Es para debatir sobre las medidas, no sobre las siglas.</p>
+  <p>Tus respuestas no se guardan ni se envían a ningún sitio: solo las ves tú.</p>
   <div class="card">
-    <strong>Próximamente</strong>
-    <p class="muted" style="margin-bottom:0">Estamos terminando de revisar los datos con fuentes oficiales.</p>
+    <strong>¿Cuánto tiempo tienes?</strong>
+    <div class="length" role="group" aria-label="Duración">
+      <button class="opt" data-k="5" aria-pressed="false">10 medidas · unos 5 min</button>
+      <button class="opt" data-k="10" aria-pressed="true">20 medidas · unos 10 min</button>
+      <button class="opt" data-k="all" aria-pressed="false">30 medidas · unos 15 min</button>
+    </div>
+    <p class="small muted">Tiempo orientativo para votar; los resultados, a tu ritmo. En las versiones cortas, las medidas salen al azar, siempre la mitad de cada lado (Gobierno y oposición) y tocando temas distintos, para que la selección no incline el resultado. Al final, junto a tus resultados, te contamos cómo se eligieron las medidas.</p>
+    <button class="btn" id="go">Empezar</button>
   </div>
+</section>
+
+<section id="s-quiz" class="hidden">
+  <p class="small muted" id="counter"></p>
+  <div class="progress"><i id="prog"></i></div>
+  <div class="card" id="qcard">
+    <p style="margin:0 0 6px"><span class="tag" id="m-topic"></span></p>
+    <p class="measure" id="m-text"></p>
+    <p class="tradeoff" id="m-trade"></p>
+    <button class="linkbtn" id="more" type="button">Saber más sobre esta medida</button>
+    <p class="ctx small hidden" id="m-ctx"></p>
+    <div class="choices" id="choices">
+      <button class="choice" data-v="si"><span class="dot" style="background:var(--yes)"></span>Me gustaría que se aprobase</button>
+      <button class="choice" data-v="no"><span class="dot" style="background:var(--no)"></span>No la quiero</button>
+      <button class="choice" data-v="duda"><span class="dot" style="background:#d97706"></span>Me importa, pero no lo tengo claro</button>
+      <button class="choice" data-v="igual"><span class="dot" style="background:var(--meh)"></span>No me parece relevante</button>
+    </div>
+  </div>
+  <div class="qnav"><button class="linkbtn" id="back" type="button">← Anterior</button><span class="small muted" style="text-align:right">Puedes volver y cambiar tu respuesta</span></div>
+</section>
+
+<section id="s-results" class="hidden">
+  <p class="small muted">Tus resultados</p>
+  <div class="card" id="summary"></div>
+
+  <div class="card" id="relatos"></div>
+
+  <div class="card">
+    <h3>Para saber más</h3>
+    <details><summary style="cursor:pointer;font-weight:600" id="hemi-sum">Cómo estaba repartido el Congreso (2023-2026)</summary>
+      <p>El Congreso tiene 350 diputados; para aprobar una ley hace falta, en general, más votos a favor que en contra, y para algunas (las orgánicas), 176. Tras las elecciones de julio de 2023 ningún partido ni bloque tenía mayoría por sí solo:</p>
+      <div id="hemi" role="img" aria-label="Reparto de los 350 escaños del Congreso tras las elecciones de julio de 2023"></div>
+      <p class="small" id="hemi-legend"></p>
+      <p>A finales de 2023, los diputados de Podemos dejaron el grupo de Sumar y pasaron al Grupo Mixto. Por eso en muchas votaciones el Gobierno necesitaba a la vez a Junts, PNV, ERC, Bildu, Podemos y otros, y bastaba con que uno se pasara al «no» para que una ley cayera.</p>
+    </details>
+    <details style="margin-top:10px"><summary style="cursor:pointer;font-weight:600">Qué es la Mesa del Congreso y por qué puede congelar leyes</summary>
+      <p>La Mesa es el órgano que organiza el trabajo de la Cámara: admite a trámite las iniciativas y fija los plazos, entre ellos el de enmiendas, en el que los grupos proponen cambios a una ley. Mientras ese plazo siga abierto, la ley no puede avanzar ni votarse.</p>
+      <p>Tiene 9 miembros elegidos por los diputados. En esta legislatura: la presidenta, Francina Armengol, y otros dos miembros del PSOE; dos de Sumar; y cuatro del PP. PSOE y Sumar sumaban mayoría (5 de 9) y con ella podían ampliar el plazo de enmiendas una y otra vez, semana tras semana. Así quedaron congeladas leyes de la oposición, pero también algunas del propio Gobierno.</p>
+      <p>No es un invento de esta legislatura: entre 2016 y 2018, con mayoría de PP y Ciudadanos en la Mesa, quedaron congeladas así unas 40 leyes de la oposición. En 2026 el Tribunal Constitucional dio la razón al PP en un recurso contra estas prórrogas sin justificar.</p>
+      <p><a href="https://maldita.es/malditateexplica/20230817/constitucion-mesa-congreso-2023-xv-legislatura/" target="_blank" rel="noopener">Composición de la Mesa (Maldita)</a> · <a href="https://www.publico.es/politica/ciudadanos-levanta-bloqueo-derogacion-ley-mordaza.html" target="_blank" rel="noopener">El bloqueo de 2016-2018 (Público)</a></p>
+    </details>
+    <details style="margin-top:10px"><summary style="cursor:pointer;font-weight:600">Cómo viaja una ley entre el Congreso y el Senado</summary>
+      <ol class="steps">
+        <li><b>Alguien la propone.</b> El Gobierno (proyecto de ley), un grupo del Congreso o el Senado (proposición de ley).</li>
+        <li><b>Congreso.</b> Decide si la tramita, se presentan enmiendas y se vota. Aquí es donde la Mesa puede congelarla.</li>
+        <li><b>Senado.</b> Tiene dos meses (20 días si es urgente) para aprobarla, cambiarla o vetarla.</li>
+        <li><b>Vuelta al Congreso.</b> Acepta o no los cambios y puede levantar el veto: por mayoría absoluta enseguida, o por mayoría simple a los dos meses. Después, al BOE.</li>
+      </ol>
+      <p>Los decretos-ley son distintos: el Gobierno los aprueba, entran en vigor ese mismo día, y solo el Congreso decide en un mes si se convalidan o se derogan.</p>
+      <p>En esta legislatura el PP tenía mayoría absoluta en el Senado (unos 143 de 265 senadores) y 4 de los 7 puestos de su Mesa. Desde el Senado podía aprobar todas las propuestas que quisiera, pero todas tenían que pasar después por el Congreso, y ahí se congelaron casi todas.</p>
+      <p>Las dos cámaras no pesan lo mismo: el Senado puede retrasar una ley, pero no tumbarla, y la última palabra es del Congreso. La Mesa del Congreso, en cambio, podía alargar los plazos sin límite. Aun así, el PP también usó su mayoría en el Senado para ganar tiempo: en noviembre de 2023 cambió el Reglamento de la Cámara para poder tardar dos meses en vez de 20 días con las propuestas urgentes que llegaban del Congreso, y la ley de amnistía estuvo así dos meses parada. El Tribunal Constitucional anuló después esa reforma.</p>
+      <p><a href="https://www.congreso.es/constitucion/ficheros/c78/cons_espa.html" target="_blank" rel="noopener">Constitución, artículos 86 a 91</a> · <a href="https://maldita.es/malditateexplica/20231117/senado-pp-reforma-reglamento/" target="_blank" rel="noopener">La reforma del Reglamento del Senado (Maldita)</a> · <a href="https://www.vozpopuli.com/espana/tc-respalda-psoe-anula-reforma-pp-amnistia.html" target="_blank" rel="noopener">El TC la anula (Vozpópuli)</a></p>
+    </details>
+    <details style="margin-top:10px"><summary style="cursor:pointer;font-weight:600">Cómo se eligieron las medidas</summary>
+      <p>Partimos de los datos abiertos del Congreso: de las casi 500 iniciativas de ley de la legislatura 2023-2026 (proyectos, proposiciones y decretos), unas 460 no salieron adelante.</p>
+      <p>De ahí quedaron 157 candidatas: las presentadas por PSOE, Sumar, PP (también desde el Senado) o Vox que se votaron en contra, se vetaron o se quedaron congeladas con diez o más ampliaciones del plazo de enmiendas. Descartamos 32, con el motivo anotado en cada una: las demasiado técnicas para entenderse sin conocimientos previos y las que acabaron aprobándose por otra vía (aunque fuera en parte o con otro mecanismo). Y las versiones repetidas de una misma propuesta cuentan como una sola. Al sorteo entraron 105.</p>
+      <p>Solo cuenta lo ocurrido hasta la disolución de las Cortes, el 6 de octubre de 2026, en los dos sentidos: ni lo aprobado después por el Gobierno en funciones «salva» una medida, ni lo frenado después cuenta como frenado. Lo posterior se cuenta en el «Qué pasó después» de cada medida.</p>
+      <p>Las 30 medidas salieron por sorteo, la mitad de cada lado, con dos ajustes: cada candidata pesa más cuanto más preocupa su tema según el CIS (la media de los barómetros de fin de trimestre, de diciembre de 2023 a septiembre de 2026), y una primera pasada garantiza que estén los 18 temas. El sorteo es reproducible: semilla pública (20261111) y orden calculado con SHA-256, con el puesto de cada candidata anotado.</p>
+      <p>Todo lo que ves sale de documentos oficiales: el Boletín de las Cortes, el Diario de Sesiones y las votaciones publicadas por el Congreso. Si una medida se votó y no encontramos en una fuente oficial qué votó cada partido, no entra.</p>
+    </details>
+  </div>
+
+  <div class="card">
+    <h3>Qué no te dice este resultado</h3>
+    <ul>
+      <li>Que un partido votase en contra no siempre significa que estuviese en contra de la idea: a veces rechazaba el paquete completo, la forma o a quien la proponía. Por eso ves el motivo que dio cada uno.</li>
+      <li>Congelar leyes no es cosa de un solo bando: en esta legislatura lo hizo la mayoría de PSOE y Sumar en la Mesa, incluso con leyes de su propio Gobierno; entre 2016 y 2018, la de PP y Ciudadanos.</li>
+      <li>Cada medida enlaza al documento oficial del Congreso o del BOE que acredita cómo acabó.</li>
+      <li>En algunas medidas, quién votó qué procede todavía de la prensa: cada una indica su fuente.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Para hablarlo con alguien</h3>
+    <p>Tus respuestas no se guardan en ningún sitio, así que nadie más puede verlas. Esta web es un ejercicio personal para «no comprar» un relato sin antes mirar los datos, y aprender a reconocer los sesgos, los nuestros y los de los demás.</p>
+    <p>Si te ha servido, compártela para que otras personas la usen y luego hablad de estas medidas en persona. Un consejo para que la conversación no acabe en «y tú más»: hablad menos de quién propuso o frenó cada medida (de los políticos) y más de las medidas en sí (de las políticas). Por ejemplo:</p>
+    <ol>
+      <li>¿Qué problema intenta resolver? ¿Es un problema real para ti o para gente que conoces?</li>
+      <li>¿A quién beneficia y a quién perjudica? ¿Quién la pagaría?</li>
+      <li>¿Qué dificultades tendría ponerla en marcha?</li>
+      <li>Si no te convence tal como está, ¿qué cambiarías para poder apoyarla?</li>
+      <li>¿En qué medidas respondisteis distinto? ¿Por qué?</li>
+    </ol>
+  </div>
+  <button class="btn ghost" id="again">Volver a empezar</button>
+</section>
+
+<footer class="small muted" style="border-top:1px solid var(--line);margin-top:32px;padding-top:14px">
+  <p>Esta web no usa cookies ni guarda tus respuestas. Está alojada en GitHub Pages, que registra la dirección IP de las visitas por seguridad.</p>
+</footer>
 </div>
+<script>
+// Datos generados desde la hoja «dato-mata-relato-medidas.xlsx» (filas con Incluir = Sí)
+const M = [
+{
+"id": "6",
+"short": "Ley de Familias",
+"group": "gob",
+"party": "PSOE y Sumar",
+"text": "Dar a las familias monoparentales los mismos derechos que a las numerosas e igualar parejas de hecho y matrimonios en permisos y ayudas.",
+"trade": "Las familias numerosas criticaban que la ley eliminaba el título de «familia numerosa».",
+"who": "Proyecto de ley · PSOE y Sumar",
+"how": "mesa",
+"date": "02/2024 → 10/2026",
+"stop": [
+"PSOE",
+"Sumar"
+],
+"stopTxt": "La mayoría de la Mesa (PSOE y Sumar) mantuvo abierto el plazo de enmiendas más de 50 veces, sin apoyos suficientes para aprobarla",
+"why": "Según la prensa, más de la mitad de la Cámara la rechazaba.",
+"after": "Caducó al disolverse las Cortes.",
+"src": "https://www.congreso.es/webpublica/ficherosportal/cuadro_plazo_enmiendas_XV.pdf",
+"press": "https://www.eldebate.com/familia/20250825/cumple-ano-medio-desde-ley-familias-quedase-estancada-congreso_328261.html",
+"ctx": "Reconocía legalmente distintos modelos de familia y agrupaba a las numerosas, las monoparentales y otras en una categoría común de familias con mayores necesidades de apoyo a la crianza.",
+"topic": "Familias y servicios sociales",
+"check": "oficial"
+},
+{
+"id": "12",
+"short": "Prohibir burka y niqab",
+"group": "opo",
+"party": "Vox",
+"text": "Prohibir el burka y el niqab en la calle y en lugares públicos, con multas y hasta cárcel para quien obligue a una mujer a llevarlo.",
+"trade": "Sus críticos decían que castiga a las propias mujeres y que nace del racismo, no del feminismo.",
+"who": "Proposición de ley orgánica · Vox",
+"how": "vot",
+"date": "17/02/2026",
+"stop": [
+"PSOE",
+"Sumar",
+"Junts",
+"ERC",
+"Bildu",
+"PNV",
+"Podemos",
+"BNG",
+"Compromís"
+],
+"stopTxt": "PSOE, Sumar, ERC, Junts, Bildu, PNV, Podemos, BNG y Compromís (177 en contra, 170 a favor de Vox, PP y UPN). Coalición Canaria se abstuvo.",
+"why": "PSOE, Sumar y ERC: «no ayudará a las mujeres». Junts: «ni burka ni Vox».",
+"after": "Rechazada su tramitación. Junts presentó después su propia ley, que tampoco salió.",
+"src": "https://www.congreso.es/public_oficiales/L15/CONG/DS/PL/DSCD-15-PL-166.PDF",
+"press": "https://www.diarioestrategia.cl/texto-diario/mostrar/5778131/congreso-tumba-ley-vox-prohibir-burka-solo-apoyada-pp-upn",
+"ctx": "Se refiere a prendas que tapan por completo el rostro, como el burka y el niqab, no al pañuelo que deja la cara al descubierto. Países como Francia o Bélgica ya las prohíben.",
+"topic": "Libertades y convivencia",
+"check": "oficial"
+},
+{
+"id": "15",
+"short": "Prórroga de alquileres y tope del 2%",
+"group": "gob",
+"party": "PSOE y Sumar",
+"text": "Permitir a los inquilinos prorrogar hasta dos años los contratos de alquiler que vencieran antes de finales de 2027 y limitar al 2% la subida anual de la renta.",
+"trade": "Sus críticos decían que congelaba los ingresos de los propietarios y que reduciría todavía más la oferta de pisos en alquiler.",
+"who": "Real decreto-ley 8/2026 · PSOE y Sumar",
+"how": "vot",
+"date": "28/04/2026",
+"stop": [
+"PP",
+"Vox",
+"Junts",
+"UPN"
+],
+"stopTxt": "PP, Vox, Junts y UPN (177 en contra, 166 a favor). PNV se abstuvo.",
+"why": "PP: las medidas «no funcionan». Junts proponía bajadas de impuestos en su lugar.",
+"after": "Derogado. Los inquilinos que ya habían pedido la prórroga mientras estuvo en vigor pueden mantenerla. Tras la disolución de las Cortes, el Gobierno aprobó por decreto-ley una nueva prórroga de los contratos (RDL 29/2026 y RDL 28/2026); la Diputación Permanente decide si se convalidan.",
+"src": "https://www.congreso.es/constitucion/ficheros/leyes_espa/rdl_008_2026_der.pdf",
+"press": "https://www.idealista.com/news/node/894694",
+"ctx": "Estuvo en vigor del 22 de marzo al 28 de abril de 2026. Se aplicaba a contratos de vivienda habitual.",
+"topic": "Vivienda",
+"check": "oficial"
+},
+{
+"id": "16",
+"short": "Testamento vital en la historia clínica",
+"group": "gob",
+"party": "PSOE",
+"text": "Garantizar que las instrucciones previas (testamento vital) consten en la historia clínica para que los sanitarios no puedan ignorarlas, e incluir en ellas la posibilidad de pedir la eutanasia.",
+"trade": "Sus críticos decían que mezclaba los cuidados al final de la vida con la eutanasia y que antes había que garantizar los cuidados paliativos.",
+"who": "Proposición de ley · PSOE",
+"how": "vot",
+"date": "10/12/2024",
+"stop": [
+"PP",
+"Vox",
+"Junts",
+"UPN",
+"PNV"
+],
+"stopTxt": "PP, Vox, Junts, PNV y UPN (180 en contra, 162 a favor). Coalición Canaria se abstuvo.",
+"why": "PP: innecesaria, porque hay legislación desde hace más de veinte años, no añade garantías a los pacientes y presume que los sanitarios quieren incumplir la ley. Vox: antes había que debatir una ley de cuidados paliativos, sin la que no hay verdadera libertad de elegir. PNV: la materia ya estaba suficientemente regulada y la ley ampliaba indebidamente la intervención del Estado en las competencias autonómicas. Junts: Cataluña tiene la competencia (art. 20 del Estatut) y la ejerce desde hace años; quería mantenerla intacta (Diario de Sesiones PL-86).",
+"after": "Rechazada su tramitación.",
+"src": "https://www.congreso.es/public_oficiales/L15/CONG/BOCG/B/BOCG-15-B-151-2.PDF",
+"press": "https://www.elindependiente.com/espana/2024/12/10/junts-y-pnv-se-unen-a-pp-y-vox-y-tumban-la-ley-del-psoe-sobre-cuidados-paliativos-y-eutanasia/",
+"ctx": "Las instrucciones previas son un documento en el que una persona deja escrito qué tratamientos quiere o no recibir si un día no puede expresarlo. Ya existen, pero no siempre constan en la historia clínica.",
+"topic": "Sanidad",
+"check": "oficial"
+},
+{
+"id": "22",
+"short": "Alquiler de temporada y habitaciones",
+"group": "gob",
+"party": "Sumar",
+"text": "Incluir los alquileres de temporada y de habitaciones en la ley de alquileres, para que no se usen para esquivar los límites y las protecciones del alquiler de vivienda habitual.",
+"trade": "Sus críticos decían que invadía competencias autonómicas y que reduciría todavía más la oferta de pisos en alquiler.",
+"who": "Proposición de ley · Sumar",
+"how": "vot",
+"date": "17/09/2024",
+"stop": [
+"PP",
+"Vox",
+"Junts",
+"UPN"
+],
+"stopTxt": "PP, Vox, Junts y UPN (178 en contra, 172 a favor).",
+"why": "Junts: invadía competencias autonómicas. Había anunciado abstención y votó no a última hora.",
+"after": "Rechazada su tramitación. Meses después otros grupos presentaron un texto parecido que sí empezó a tramitarse, pero quedó parado con prórrogas del plazo de enmiendas y caducó. Tras la disolución de las Cortes, el Gobierno reguló el alquiler de temporada y por habitaciones por decreto-ley (RDL 29/2026, en vigor desde el 08/10/2026); la Diputación Permanente decide si se convalida.",
+"src": "https://www.congreso.es/public_oficiales/L15/CONG/BOCG/B/BOCG-15-B-134-5.PDF",
+"press": "https://www.vozpopuli.com/espana/politica/junts-castigar-gobierno-tumba-proposicion-regular-alquileres-temporales.html",
+"ctx": "Hoy los contratos de temporada y de habitaciones quedan fuera de las reglas del alquiler de vivienda habitual, como la duración mínima o los límites de subida. La propuesta obligaba a justificar por qué un contrato es temporal.",
+"topic": "Vivienda",
+"check": "oficial"
+},
+{
+"id": "23",
+"short": "Oficina contra la corrupción",
+"group": "gob",
+"party": "Sumar",
+"text": "Crear una oficina estatal independiente para prevenir y detectar la corrupción en todas las administraciones, con poder para investigar y poner multas de hasta un millón de euros.",
+"trade": "Sus críticos decían que su dirección dependería de la mayoría parlamentaria del momento y que duplicaba organismos que ya existen.",
+"who": "Proposición de ley · Sumar",
+"how": "vot",
+"date": "16/09/2025",
+"stop": [
+"PP",
+"Vox",
+"Junts"
+],
+"stopTxt": "PP, Vox y Junts (176 en contra, 170 a favor). UPN se abstuvo.",
+"why": "PP: no entró en el contenido y acusó a sus autores de sostener a un Gobierno salpicado por la corrupción. Junts: no se pueden dar lecciones de integridad desde el «régimen del 78».",
+"after": "Rechazada su tramitación. En septiembre de 2026 el Gobierno llevó al Congreso su propia ley con una Agencia Independiente de Integridad Pública; caducó con la disolución sin llegar a votarse.",
+"src": "https://www.congreso.es/public_oficiales/L15/CONG/BOCG/B/BOCG-15-B-99-2.PDF",
+"press": "https://www.eldiario.es/1_c062a0",
+"ctx": "Ya existen oficinas parecidas en algunas comunidades autónomas. Esta abarcaría todo el sector público estatal, con un sistema de alertas tempranas y protección para quien denuncie.",
+"topic": "Instituciones y transparencia",
+"check": "oficial"
+},
+{
+"id": "28",
+"short": "Tarjeta sanitaria única",
+"group": "opo",
+"party": "Vox",
+"text": "Que la tarjeta sanitaria y el historial clínico funcionen igual en toda España, para que cualquier paciente sea atendido y reciba su medicación en cualquier comunidad.",
+"trade": "Sus críticos decían que el sistema ya permite consultar datos entre comunidades y que la propuesta buscaba recentralizar la sanidad.",
+"who": "Proposición de ley · Vox",
+"how": "vot",
+"date": "26/11/2024",
+"stop": [
+"CC",
+"PSOE",
+"Sumar",
+"Junts",
+"ERC",
+"Bildu",
+"PNV",
+"Podemos",
+"BNG"
+],
+"stopTxt": "PSOE, Sumar, ERC, Junts, Bildu, PNV, Podemos, BNG y Coalición Canaria (174 en contra, 32 a favor). El PP y UPN se abstuvieron.",
+"why": "Sumar, PNV y ERC: la interoperabilidad ya existe.",
+"after": "Rechazada su tramitación.",
+"src": "https://www.congreso.es/public_oficiales/L15/CONG/BOCG/B/BOCG-15-B-120-2.PDF",
+"press": "https://www.redaccionmedica.com/politica/20241126/muface-competencias-roban-protagonismo-la-tarjeta-unica-en-el-congreso/235695_0.html",
+"ctx": "Hoy cada comunidad emite su propia tarjeta sanitaria. Existe un sistema para compartir datos clínicos entre comunidades, pero los pacientes denuncian que no siempre funciona fuera de la suya.",
+"topic": "Sanidad",
+"check": "oficial"
+},
+{
+"id": "30",
+"short": "Sanidad pública para más colectivos",
+"group": "gob",
+"party": "PSOE y Sumar",
+"text": "Ampliar la sanidad pública a más colectivos, como los padres de inmigrantes que vienen a vivir con sus hijos, los solicitantes de asilo o las víctimas de trata, y prohibir que se creen nuevos copagos.",
+"trade": "Sus críticos decían que aumentaba el gasto sanitario y que podía atraer a personas mayores que nunca han cotizado en España.",
+"who": "Proyecto de ley · PSOE y Sumar",
+"how": "mesa",
+"date": "05/2024 → 10/2026",
+"stop": [
+"PSOE",
+"Sumar"
+],
+"stopTxt": "Mayoría de la Mesa del Congreso (PSOE y Sumar)",
+"why": "Ampliaciones sucesivas del plazo de enmiendas (83 según los datos abiertos del Congreso).",
+"after": "Caducó al disolverse las Cortes sin haberse votado.",
+"src": "https://www.congreso.es/public_oficiales/L15/CONG/BOCG/A/BOCG-15-A-21-1.PDF",
+"press": "",
+"ctx": "Desde 2018 las personas sin papeles pueden ser atendidas en la sanidad pública; esta ley lo dejaba fijado por ley y añadía nuevos colectivos. En 2012 se habían introducido copagos en algunas prestaciones.",
+"topic": "Sanidad",
+"check": "oficial"
+},
+{
+"id": "31",
+"short": "Desclasificar secretos oficiales",
+"group": "gob",
+"party": "PSOE y Sumar",
+"text": "Sustituir la ley de secretos oficiales de 1968 por una nueva que obligue a desclasificar automáticamente los documentos secretos pasado un plazo: 45 años para los de «alto secreto», prorrogables una sola vez 15 años más.",
+"trade": "Sus críticos decían que los plazos eran demasiado largos, hasta 60 años, y que seguirían sin conocerse durante décadas documentos de la Transición o de la lucha antiterrorista.",
+"who": "Proyecto de ley · PSOE y Sumar",
+"how": "mesa",
+"date": "07/2025 → 10/2026",
+"stop": [
+"PSOE",
+"Sumar"
+],
+"stopTxt": "Mayoría de la Mesa del Congreso (PSOE y Sumar)",
+"why": "Ampliaciones sucesivas del plazo de enmiendas (40 según los datos abiertos del Congreso).",
+"after": "Caducó al disolverse las Cortes sin haberse votado.",
+"src": "https://www.congreso.es/public_oficiales/L15/CONG/BOCG/A/BOCG-15-A-65-1.PDF",
+"press": "",
+"ctx": "La ley vigente es de 1968, anterior a la Constitución, y no prevé que los secretos se desclasifiquen nunca de forma automática. Hoy un documento clasificado puede seguir siéndolo indefinidamente.",
+"topic": "Instituciones y transparencia",
+"check": "oficial"
+},
+{
+"id": "34",
+"short": "Recuperar la justicia universal",
+"group": "gob",
+"party": "Sumar",
+"text": "Que los tribunales españoles puedan volver a juzgar genocidios, crímenes de guerra, torturas o desapariciones cometidos en otros países aunque el acusado no esté en España, como se hacía antes de 2009.",
+"trade": "Sus críticos decían que genera conflictos diplomáticos con otros países y llena los juzgados de causas muy difíciles de llevar a juicio.",
+"who": "Proposición de ley orgánica · Sumar",
+"how": "mesa",
+"date": "10/2023 → 10/2026",
+"stop": [
+"PSOE",
+"Sumar"
+],
+"stopTxt": "Mayoría de la Mesa del Congreso (PSOE y Sumar)",
+"why": "Ampliaciones sucesivas del plazo de enmiendas (95 según los datos abiertos del Congreso).",
+"after": "Caducó al disolverse las Cortes sin haberse votado.",
+"src": "https://www.congreso.es/public_oficiales/L15/CONG/BOCG/B/BOCG-15-B-28-1.PDF",
+"press": "",
+"ctx": "Gracias a la jurisdicción universal, un juez español pidió en 1998 la detención de Pinochet. Las reformas de 2009 y 2014 la limitaron: hoy, por ejemplo, para perseguir un genocidio se exige que el acusado esté en España.",
+"topic": "Justicia y seguridad",
+"check": "oficial"
+},
+{
+"id": "44",
+"short": "Impuesto a las grandes energéticas en 2025",
+"group": "gob",
+"party": "PSOE y Sumar",
+"text": "Cobrar en 2025 un gravamen del 1,2 % de la facturación a las grandes empresas energéticas (más de 1.000 millones de ingresos), con descuentos para las que inviertan en descarbonización.",
+"trade": "Sus críticos decían que frenaba la inversión en el sector y que se aprobaba por decreto un impuesto que no había logrado apoyos para prorrogarse por ley.",
+"who": "Real decreto-ley · PSOE y Sumar",
+"how": "vot",
+"date": "22/01/2025",
+"stop": [
+"PP",
+"Vox",
+"Junts",
+"UPN",
+"PNV"
+],
+"stopTxt": "PP, Vox, Junts, PNV y UPN (183 en contra, 165 a favor). Coalición Canaria se abstuvo. Hacía falta que cambiaran a la vez Junts y PNV para que saliera adelante.",
+"why": "PNV y Junts: ponía en riesgo inversiones ya anunciadas por las empresas energéticas. El PNV, además, quería que fuera un impuesto que pudieran gestionar las haciendas vascas.",
+"after": "Derogado. No se volvió a aprobar en la legislatura.",
+"src": "https://www.boe.es/boe/dias/2025/01/23/pdfs/BOE-A-2025-1137.pdf",
+"press": "https://www.elindependiente.com/espana/2025/01/22/bildu-fracasa-en-su-intento-por-convencer-al-pnv-con-la-tasa-energetica-solo-quiere-ahorrar-100-millones-a-imaz/amp/",
+"ctx": "Sustituía al gravamen temporal de 2023 y 2024, que la reforma fiscal de diciembre de 2024 había dejado caer. Incluía el compromiso de convertirlo en un impuesto permanente.",
+"topic": "Economía e impuestos",
+"check": "oficial"
+},
+{
+"id": "45",
+"short": "Prohibir despidos por llevarse la empresa fuera",
+"group": "gob",
+"party": "Sumar",
+"text": "Prohibir los despidos colectivos en las empresas que trasladen su actividad fuera de la Unión Europea, y obligar a devolver las ayudas de ERTE si lo hacen en los cuatro años siguientes a recibirlas.",
+"trade": "Sus críticos decían que era desproporcionada, que se metía en cómo se organizan las empresas y que añadía cargas burocráticas.",
+"who": "Proposición de ley · Sumar",
+"how": "vot",
+"date": "24/02/2026",
+"stop": [
+"PP",
+"Vox",
+"Junts",
+"UPN"
+],
+"stopTxt": "PP, Vox, Junts y UPN (178 en contra, 168 a favor). Coalición Canaria se abstuvo. Con los 7 votos de Junts a favor, habría salido adelante.",
+"why": "PP: «desproporcionada», criminalizaba a las empresas y era un proteccionismo que acaba destruyendo empleo. Junts: hacía más rígido el marco laboral y generaba una inseguridad jurídica que ahuyenta a los inversores; el despido debía abordarse en una reforma laboral integral y desde el diálogo social, y parte del contenido ya estaba en el proyecto de ley de industria en trámite (Diario de Sesiones PL-168).",
+"after": "Rechazada su tramitación.",
+"src": "https://www.congreso.es/public_oficiales/L15/CONG/BOCG/B/BOCG-15-B-113-2.PDF",
+"press": "https://forbes.es/economia/879348/pp-vox-y-junts-desdenan-la-ley-de-sumar-para-prohibir-los-despidos-en-deslocalizaciones-de-empresas/",
+"ctx": "También obligaba a negociar con la plantilla un plan de viabilidad cuando se vende una empresa de 50 o más trabajadores. Si se incumplía, los despidos serían improcedentes o nulos.",
+"topic": "Trabajo",
+"check": "oficial"
+},
+{
+"id": "46",
+"short": "Avisar de la reduflación",
+"group": "gob",
+"party": "PSOE",
+"text": "Obligar a avisar en la tienda, durante al menos 90 días, cuando un producto trae menos cantidad en el mismo envase y por eso sube su precio por kilo o por litro.",
+"trade": "Sus críticos decían que ya existe la obligación de mostrar el precio por unidad de medida y que bastaba con hacerla cumplir.",
+"who": "Proposición de ley · PSOE",
+"how": "mesa",
+"date": "10/2024 → 10/2026",
+"stop": [
+"PSOE",
+"Sumar"
+],
+"stopTxt": "Mayoría de la Mesa del Congreso (PSOE y Sumar)",
+"why": "Ampliaciones sucesivas del plazo de enmiendas (62 según los datos abiertos del Congreso).",
+"after": "Caducó al disolverse las Cortes sin haberse votado.",
+"src": "https://www.congreso.es/public_oficiales/L15/CONG/BOCG/B/BOCG-15-B-149-1.PDF",
+"press": "",
+"ctx": "La «reduflación» es reducir la cantidad de un producto manteniendo el precio y el envase. Francia obliga desde 2024 a avisar de ello en los supermercados.",
+"topic": "Consumo",
+"check": "oficial"
+},
+{
+"id": "47",
+"short": "Medir el impacto de las leyes en los jóvenes",
+"group": "gob",
+"party": "PSOE",
+"text": "Obligar a evaluar, antes de aprobarlas, cómo afectan a la infancia y la juventud las leyes y políticas del Estado, como ya se hace con la igualdad de género o el reto demográfico.",
+"trade": "Sus críticos decían que era una medida sin efectos prácticos y que la evaluación de políticas públicas ya permitía analizar ese impacto.",
+"who": "Proposición de ley · PSOE",
+"how": "vot",
+"date": "17/02/2026",
+"stop": [
+"PP",
+"Vox",
+"Junts"
+],
+"stopTxt": "PP, Vox y Junts (174 en contra, 172 a favor). Con los 7 votos de Junts a favor, habría salido adelante.",
+"why": "PP: los jóvenes no piden más informes sino resultados en vivienda, salarios y emancipación, y la agencia de evaluación creada en 2022 ni siquiera estaba en marcha. Junts: la ley de 2022 ya permitía evaluar, no crearía ni empleo ni vivienda, y era mejor invertir esos recursos en políticas reales. Vox: solo beneficiaría a los jóvenes afines al Gobierno, como el Consejo de la Juventud. A favor, el PNV: en Euskadi la evaluación en clave joven ya es cotidiana (Diario de Sesiones PL-166).",
+"after": "Rechazada su tramitación.",
+"src": "https://www.congreso.es/public_oficiales/L15/CONG/BOCG/B/BOCG-15-B-278-2.PDF",
+"press": "",
+"ctx": "Modificaba la ley de 2022 que creó la Agencia de Evaluación de Políticas Públicas. Es lo que en Europa se llama «test joven».",
+"topic": "Juventud",
+"check": "oficial"
+},
+{
+"id": "49",
+"short": "Elegir centro de educación especial",
+"group": "opo",
+"party": "PP",
+"text": "Garantizar por ley que las familias de alumnos con necesidades educativas especiales puedan elegir entre centro ordinario y centro de educación especial, y que estos puedan escolarizar hasta los 21 años.",
+"trade": "Sus críticos decían que suponía volver a separar al alumnado con discapacidad en lugar de apostar por su inclusión en los centros ordinarios.",
+"who": "Proposición de ley orgánica · PP",
+"how": "vot",
+"date": "09/09/2025",
+"stop": [
+"CC",
+"PSOE",
+"Sumar",
+"Junts",
+"ERC",
+"Bildu",
+"PNV",
+"Podemos",
+"BNG",
+"Compromís"
+],
+"stopTxt": "PSOE, Sumar, ERC, Junts, Bildu, PNV, Podemos, BNG, Compromís, Coalición Canaria y Ábalos (177 en contra, 170 a favor de PP, Vox y UPN). Con los 7 votos de Junts a favor, habría salido adelante.",
+"why": "PSOE: «quieren segregar al alumnado con discapacidad».",
+"after": "Rechazada su tramitación.",
+"src": "https://www.congreso.es/public_oficiales/L15/CONG/BOCG/B/BOCG-15-B-222-2.PDF",
+"press": "https://www.deia.eus/politica/2025/09/09/psoe-socios-parlamentarios-tramitar-ley-10064195.html",
+"ctx": "La ley de 2020 (LOMLOE) prevé que en diez años los centros ordinarios puedan atender a la mayoría de este alumnado y que los de educación especial pasen a ser también centros de apoyo. Hoy lo decide la Administración, oyendo a las familias.",
+"topic": "Educación",
+"check": "oficial"
+},
+{
+"id": "53",
+"short": "Multas por atacar el patrimonio histórico",
+"group": "opo",
+"party": "PP",
+"text": "Castigar con multas de hasta 150.000 euros los daños a obras de arte y bienes protegidos, incluidos los ataques de protesta que los ponen en riesgo aunque no lleguen a dañarlos, y permitir restringir temporalmente la entrada a museos, archivos y bibliotecas del Estado a quienes hayan sido sancionados o condenados por ello.",
+"trade": "Sus críticos decían que el Código Penal ya castiga los daños al patrimonio y que podía usarse para castigar protestas pacíficas.",
+"who": "Proposición de ley · PP",
+"how": "vot",
+"date": "18/06/2024",
+"stop": [
+"PSOE",
+"Sumar",
+"Junts",
+"ERC",
+"Bildu",
+"Podemos",
+"BNG"
+],
+"stopTxt": "PSOE, Sumar, ERC, Junts, Bildu, Podemos, BNG y Ábalos desde el Grupo Mixto (170 en contra, 168 a favor). PNV y Coalición Canaria se abstuvieron; UPN votó a favor. Con los 4 votos del PNV a favor, habría salido adelante.",
+"why": "Sumar y Podemos: buscaba castigar a los activistas climáticos y coartar la protesta. ERC: populismo legislativo, innecesario. Bildu: era una actitud punitiva y la Constitución solo permite prohibir reuniones si hay peligro para personas o bienes. Junts: en contra de cualquier vandalismo, pero Cataluña tiene competencia exclusiva en patrimonio y ley propia. PSOE: el PP no cuida el patrimonio donde gobierna; se protege con inversión. Abstención del PNV: está a favor de proteger, pero el texto no dejaba claro quién decide a qué «personas o grupos» se les puede restringir el acceso a museos (Diario de Sesiones PL-49).",
+"after": "Rechazada su tramitación. El Senado aprobó después una ley igual (124/000013), que en el Congreso quedó congelada hasta caducar con la disolución.",
+"src": "https://www.congreso.es/public_oficiales/L15/CONG/BOCG/B/BOCG-15-B-46-1.PDF",
+"press": "",
+"ctx": "Surgió tras las acciones de activistas climáticos contra cuadros en museos. Hoy ya pueden ser delito: un juzgado de Madrid condenó a cuatro activistas por los daños al pintar la fachada del Congreso.",
+"topic": "Cultura y deporte",
+"check": "oficial"
+},
+{
+"id": "54",
+"short": "Cuota cero para autónomos que ganen menos del SMI",
+"group": "opo",
+"party": "Vox",
+"text": "Que los autónomos que ingresen menos del salario mínimo puedan no pagar cuota a la Seguridad Social, y dar seis meses para pagar el IRPF y el IVA.",
+"trade": "Los meses sin cuota no contarían para el paro de autónomos. Sus críticos decían que restaba ingresos a la Seguridad Social.",
+"who": "Proposición de ley · Vox",
+"how": "vet",
+"date": "09/2024",
+"stop": [
+"PSOE",
+"Sumar"
+],
+"stopTxt": "El Gobierno (PSOE y Sumar), por su impacto presupuestario",
+"why": "Disconformidad presupuestaria (art. 134.6 de la Constitución).",
+"after": "No llegó a debatirse.",
+"src": "https://www.congreso.es/public_oficiales/L15/CONG/BOCG/B/BOCG-15-B-118-2.PDF",
+"press": "",
+"ctx": "Desde 2023 los autónomos cotizan por tramos según sus ingresos reales; el tramo más bajo paga unos 200 euros al mes. La cuota cero sería opcional e incompatible con el ingreso mínimo vital.",
+"topic": "Trabajo",
+"check": "oficial"
+},
+{
+"id": "55",
+"short": "Solo las personas pueden comprar vivienda",
+"group": "gob",
+"party": "Sumar",
+"text": "Que solo las personas puedan comprar viviendas, y no las empresas ni los fondos de inversión. Habría excepciones para asociaciones y entidades sin ánimo de lucro que las usen como sede, residencia social, refugio para víctimas de violencia de género, culto o enseñanza.",
+"trade": "Sus críticos decían que limitaba demasiado el derecho de propiedad, que podía ser inconstitucional y que frenaría la inversión que construye y alquila viviendas.",
+"who": "Proposición de ley · Sumar",
+"how": "vot",
+"date": "15/09/2026",
+"stop": [
+"PP",
+"Vox",
+"Junts",
+"UPN"
+],
+"stopTxt": "PP, Vox, Junts, UPN y un diputado del Grupo Mixto (175 en contra, 44 a favor). PSOE, PNV y Coalición Canaria se abstuvieron (127 abstenciones). Aunque el PSOE hubiera votado a favor, no habría salido: 164 contra 175.",
+"why": "PP: la limitación a empresas ya fracasó, ataca solo a un 10 % de las compras, flaquea jurídicamente e impediría a las empresas comprar vivienda para sus trabajadores, mientras el propio Estado acumula viviendas (Sareb, Casa47). Vox: impedir que compre una empresa no hace que pueda comprar una familia; propone bajar impuestos a la primera vivienda y gravar a compradores extranjeros. Junts: no baja precios ni crea vivienda, tiene agujeros jurídicos y Cataluña ya tiene competencias e instrumentos propios. Abstenciones: el PSOE, por coherencia con la ley y el ordenamiento vigente; el PNV, porque las medidas deben decidirlas los territorios competentes (Diario de Sesiones PL-204).",
+"after": "Rechazada su tramitación. Una propuesta parecida ya se había rechazado en noviembre de 2025. Tras la disolución de las Cortes, el Gobierno aprobó por decreto-ley (RDL 29/2026) una prohibición temporal, hasta 2028, para que los grandes fondos compren vivienda; la Diputación Permanente decide si se convalida.",
+"src": "https://www.congreso.es/public_oficiales/L15/CONG/BOCG/B/BOCG-15-B-300-1.PDF",
+"press": "https://www.que.es/2026/09/16/ley-vivienda-fondos-congreso/",
+"ctx": "Afectaba a cualquier compra de vivienda, nueva o usada. Las compras ya firmadas ante notario antes de la ley se respetaban.",
+"topic": "Vivienda",
+"check": "oficial"
+},
+{
+"id": "56",
+"short": "Que investiguen los fiscales y no los jueces",
+"group": "gob",
+"party": "PSOE y Sumar",
+"text": "Que los fiscales dirijan la investigación de los delitos, en lugar de los jueces de instrucción, con un juez de garantías que vigile los derechos de los investigados. También limitaba quién puede ejercer la acusación popular: no podrían hacerlo los partidos políticos, los sindicatos ni sus asociaciones, y solo para algunos delitos.",
+"trade": "Sus críticos decían que al fiscal general lo nombra el Gobierno, por lo que dejar la investigación en la Fiscalía restaba independencia, y que limitar la acusación popular protegía a los políticos investigados.",
+"who": "Proyecto de ley orgánica · PSOE y Sumar",
+"how": "mesa",
+"date": "11/2025 → 10/2026",
+"stop": [
+"PSOE",
+"Sumar"
+],
+"stopTxt": "Mayoría de la Mesa del Congreso (PSOE y Sumar)",
+"why": "Ampliaciones sucesivas del plazo de enmiendas (30 según los datos abiertos del Congreso).",
+"after": "Caducó al disolverse las Cortes sin haberse votado.",
+"src": "https://www.congreso.es/public_oficiales/L15/CONG/BOCG/A/BOCG-15-A-74-1.PDF",
+"press": "",
+"ctx": "En la mayoría de países europeos investiga el fiscal; en España lo hace un juez de instrucción. La acusación popular permite a cualquier ciudadano o asociación acusar en un juicio penal aunque no sea víctima.",
+"topic": "Justicia y seguridad",
+"check": "oficial"
+},
+{
+"id": "57",
+"short": "Topar precios en emergencias",
+"group": "gob",
+"party": "PSOE y Sumar",
+"text": "Permitir al Gobierno limitar durante una emergencia los precios de bienes y servicios básicos, para que nadie aproveche la situación para subirlos.",
+"trade": "Sus críticos decían que daba al Gobierno poder para fijar precios cuando él mismo decidiera que había una emergencia, sin control del Congreso ni límite de tiempo, y que los topes de precios acaban reduciendo la oferta.",
+"who": "Real decreto-ley 4/2026 · PSOE y Sumar",
+"how": "vot",
+"date": "26/02/2026",
+"stop": [
+"PP",
+"Vox",
+"Junts"
+],
+"stopTxt": "PP, Vox y Junts (177 en contra, 172 a favor). UPN se abstuvo. Con solo la abstención de Junts, habría salido adelante.",
+"why": "Junts: el Gobierno se daba un poder para intervenir precios sin control parlamentario ni límite temporal, y eso debía aprobarse por ley en el Congreso. PP: el supuesto de «otras circunstancias sobrevenidas» era demasiado amplio y los topes reducen la oferta. Vox: tras el accidente de Adamuz las propias empresas corrigieron los precios en un día.",
+"after": "Derogado. Tras la disolución de las Cortes, el Gobierno lo volvió a aprobar con el RDL 32/2026 (3 de noviembre); lo tiene que convalidar la Diputación Permanente.",
+"src": "https://www.congreso.es/public_oficiales/L15/CONG/BOCG/D/BOCG-15-D-489.PDF",
+"press": "https://www.eldiario.es/1_c6b8df",
+"ctx": "Se aprobó tras el accidente de tren de Adamuz (enero de 2026), cuando subieron los precios de vuelos y transporte alternativo. El tope solo se activaría con un acuerdo del Consejo de Ministros que fijara las fechas, los productos afectados y el precio de referencia.",
+"topic": "Economía e impuestos",
+"check": "oficial"
+},
+{
+"id": "58",
+"short": "Ilegalizar partidos independentistas",
+"group": "opo",
+"party": "Vox",
+"text": "Ilegalizar los partidos que tengan como objetivo la independencia de una parte de España, castigar con cárcel (hasta 10 años) a las autoridades que convoquen un referéndum ilegal sobre la independencia, y poder quitar la nacionalidad española, como pena, a quienes no la tengan de origen.",
+"trade": "Sus críticos decían que la Constitución permite defender cualquier idea por vías pacíficas y que ilegalizar partidos por sus objetivos iría contra la libertad política.",
+"who": "Proposición de ley orgánica · Vox",
+"how": "vot",
+"date": "20/02/2024",
+"stop": [
+"PSOE",
+"Sumar",
+"PP",
+"Junts",
+"ERC",
+"Bildu",
+"PNV"
+],
+"stopTxt": "Todos los demás grupos: PSOE, PP, Sumar, ERC, Junts, Bildu, PNV y Grupo Mixto (313 en contra, 33 a favor).",
+"why": "PP: ilegalizar partidos independentistas por serlo va contra la Constitución y la doctrina del Tribunal Constitucional, y no apoyaba más penas para los españoles nacionalizados que para los de origen. PNV: inventaba un tipo penal «absolutamente indefinido» y sin sentido jurídico. PSOE: el camino es el diálogo y la convivencia, no la prohibición. Sumar: ilegalizaba tener otra concepción de España y pisoteaba la Constitución. ERC: la respuesta de la extrema derecha se resume en un verbo, prohibir (Diario de Sesiones PL-23).",
+"after": "Rechazada su tramitación.",
+"src": "https://www.congreso.es/public_oficiales/L15/CONG/BOCG/B/BOCG-15-B-31-1.PDF",
+"press": "https://www.ondavasca.com/vox-vuelve-a-quedarse-solo-en-su-propuesta-para-ilegalizar-partidos-independentistas/",
+"ctx": "La ley de partidos de 2002 ya permite ilegalizar a los que apoyen la violencia o el terrorismo, pero no por defender la independencia de forma pacífica.",
+"topic": "Instituciones y transparencia",
+"check": "oficial"
+},
+{
+"id": "59",
+"short": "Pymes: descontar el IAE del impuesto de sociedades",
+"group": "opo",
+"party": "PP",
+"text": "Que las pequeñas y medianas empresas puedan descontar del impuesto de sociedades lo que pagan del impuesto de actividades económicas (IAE), y eximir de este a las empresas que facturen menos de 2 millones de euros al año. Los ayuntamientos seguirían cobrando lo mismo.",
+"trade": "Sus críticos decían que reducía la recaudación del Estado sin explicar cómo compensarla y que beneficiaba también a empresas que no lo necesitan.",
+"who": "Proposición de ley (Senado) · PP",
+"how": "mesa",
+"date": "06/2025 → 10/2026",
+"stop": [
+"PSOE",
+"Sumar"
+],
+"stopTxt": "Mayoría de la Mesa del Congreso (PSOE y Sumar)",
+"why": "Ampliaciones sucesivas del plazo de enmiendas (41 según los datos abiertos del Congreso).",
+"after": "Caducó al disolverse las Cortes sin haberse votado.",
+"src": "https://www.congreso.es/public_oficiales/L15/CONG/BOCG/B/BOCG-15-B-249-1.PDF",
+"press": "",
+"ctx": "El IAE lo cobran los ayuntamientos a quienes ejercen una actividad económica. Desde 2003 solo lo pagan las empresas que facturan más de un millón de euros al año.",
+"topic": "Economía e impuestos",
+"check": "oficial"
+},
+{
+"id": "60",
+"short": "El presidente, al Congreso antes de cada Consejo Europeo",
+"group": "opo",
+"party": "PP",
+"text": "Obligar al presidente del Gobierno a comparecer en las Cortes antes de cada Consejo Europeo para explicar qué posiciones va a defender, y antes de cualquier cambio de política exterior que se aparte de la estrategia aprobada.",
+"trade": "Sus críticos decían que el presidente ya informa al Congreso de los Consejos Europeos y que la Constitución atribuye la política exterior al Gobierno.",
+"who": "Proposición de ley · PP",
+"how": "mesa",
+"date": "01/2024 → 10/2026",
+"stop": [
+"PSOE",
+"Sumar"
+],
+"stopTxt": "Mayoría de la Mesa del Congreso (PSOE y Sumar)",
+"why": "Ampliaciones sucesivas del plazo de enmiendas (81 según los datos abiertos del Congreso).",
+"after": "Caducó al disolverse las Cortes sin haberse votado.",
+"src": "https://www.congreso.es/public_oficiales/L15/CONG/BOCG/B/BOCG-15-B-61-1.PDF",
+"press": "",
+"ctx": "El Consejo Europeo reúne a los jefes de Gobierno de la Unión Europea varias veces al año para fijar sus prioridades.",
+"topic": "Defensa",
+"check": "oficial"
+},
+{
+"id": "62",
+"short": "Salvar casas tradicionales en la costa",
+"group": "opo",
+"party": "PP",
+"text": "Que pueblos y conjuntos de casas tradicionales junto al mar, que hoy están en terreno público de costas, puedan salvarse del derribo si tienen un valor cultural o etnológico reconocido por su comunidad autónoma.",
+"trade": "Sus críticos decían que abría la puerta a legalizar construcciones en la costa y que debilitaba la protección frente a la subida del nivel del mar.",
+"who": "Proposición de ley · PP",
+"how": "mesa",
+"date": "04/2025 → 10/2026",
+"stop": [
+"PSOE",
+"Sumar"
+],
+"stopTxt": "Mayoría de la Mesa del Congreso (PSOE y Sumar)",
+"why": "Ampliaciones sucesivas del plazo de enmiendas (42 según los datos abiertos del Congreso).",
+"after": "Caducó al disolverse las Cortes sin haberse votado.",
+"src": "https://www.congreso.es/public_oficiales/L15/CONG/BOCG/B/BOCG-15-B-207-1.PDF",
+"press": "",
+"ctx": "La Ley de Costas declara públicos la playa y los terrenos que alcanza el mar. Muchas casas construidas antes quedaron dentro y dependen de concesiones que van caducando.",
+"topic": "Medio ambiente y energía",
+"check": "oficial"
+},
+{
+"id": "63",
+"short": "Devolver los delitos sexuales a los juzgados ordinarios",
+"group": "opo",
+"party": "PP",
+"text": "Que los juzgados especializados en violencia contra las mujeres dejen de llevar todos los delitos sexuales contra mujeres y vuelvan a llevar solo los de pareja o expareja, y dar prioridad a los jueces especializados al cubrir sus plazas.",
+"trade": "Sus críticos decían que la ampliación a todos los delitos sexuales la exigen los convenios internacionales y que el problema se resolvía con más jueces, no quitando competencias.",
+"who": "Proposición de ley orgánica · PP",
+"how": "vot",
+"date": "25/03/2025",
+"stop": [
+"CC",
+"PSOE",
+"Sumar",
+"Vox",
+"ERC",
+"Bildu",
+"Podemos",
+"BNG"
+],
+"stopTxt": "PSOE, Vox, Sumar, ERC, Bildu, Podemos, BNG y Coalición Canaria (196 en contra, 149 a favor). Junts, PNV y UPN votaron a favor.",
+"why": "PSOE: la solución a la sobrecarga es poner más recursos y jueces, no quitar competencias; la especialización ya estaba en marcha por otra vía. Sumar, Podemos y BNG: era un paso atrás, porque la violencia sexual también es violencia contra las mujeres, y lo exigen los compromisos internacionales. Vox: rechazó el enfoque de la violencia de género en el que se basa la propia ley y la formación obligatoria de los jueces en esa materia. A favor parcialmente, el PNV, como apoyo a los profesionales de la justicia (Diario de Sesiones PL-106).",
+"after": "Rechazada su tramitación. Desde octubre de 2025 estos juzgados llevan todos los delitos sexuales contra mujeres.",
+"src": "https://www.congreso.es/public_oficiales/L15/CONG/BOCG/B/BOCG-15-B-172-1.PDF",
+"press": "",
+"ctx": "La ley de eficiencia de la justicia (2025) amplió la competencia de estos juzgados a todos los delitos sexuales contra mujeres, no solo los de pareja. Asociaciones de jueces avisaron de que se colapsarían; el Gobierno creó 50 plazas de jueces más.",
+"topic": "Igualdad",
+"check": "oficial"
+},
+{
+"id": "64",
+"short": "Emergencia nacional para pueblos pequeños",
+"group": "opo",
+"party": "PP",
+"text": "Que, cuando una catástrofe deje sin servicios básicos a varios pueblos de menos de 5.000 habitantes, se declare emergencia de interés nacional, para que la dirija el Estado y lleguen antes los medios.",
+"trade": "Sus críticos decían que quitaba la dirección de las emergencias a las comunidades autónomas y centralizaba decisiones que se toman mejor sobre el terreno.",
+"who": "Proposición de ley · PP",
+"how": "vot",
+"date": "18/11/2025",
+"stop": [
+"CC",
+"PSOE",
+"Sumar",
+"Junts",
+"ERC",
+"Bildu",
+"PNV",
+"Podemos",
+"BNG"
+],
+"stopTxt": "PSOE, Sumar, ERC, Junts, Bildu, PNV, Podemos, BNG y Coalición Canaria (177 en contra, 170 a favor). Vox y UPN votaron a favor. Con los 7 votos de Junts a favor, habría salido adelante.",
+"why": "Junts: invadía competencias, porque Cataluña tiene la competencia exclusiva en protección civil (art. 132 del Estatut), y lo llamó una recentralización encubierta (Diario de Sesiones PL-152).",
+"after": "Rechazada su tramitación.",
+"src": "https://www.congreso.es/public_oficiales/L15/CONG/BOCG/B/BOCG-15-B-221-1.PDF",
+"press": "https://www.redaccionmedica.com/politica/20251118/el-congreso-tumba-una-direccion-central-en-salud-para-emergencias-rurales/253724_0.html",
+"ctx": "Hoy cada comunidad dirige sus emergencias, salvo que el Estado declare una emergencia de interés nacional, algo que no se hizo en la dana de 2024.",
+"topic": "Campo y medio rural",
+"check": "oficial"
+},
+{
+"id": "65",
+"short": "Jubilación anticipada para policías y guardias civiles",
+"group": "opo",
+"party": "PP",
+"text": "Permitir a policías nacionales, guardias civiles y agentes de Vigilancia Aduanera jubilarse antes según sus años de servicio, como ya pueden los policías autonómicos y locales.",
+"trade": "Sus críticos decían que tenía un coste alto sin un estudio de impacto y que el Gobierno ya lo estaba negociando con sindicatos y asociaciones.",
+"who": "Proposición de ley · PP",
+"how": "vet",
+"date": "09/2026",
+"stop": [
+"PSOE",
+"Sumar"
+],
+"stopTxt": "El Gobierno (PSOE y Sumar), por su impacto presupuestario",
+"why": "Disconformidad presupuestaria (art. 134.6 de la Constitución).",
+"after": "No llegó a debatirse.",
+"src": "https://www.congreso.es/public_oficiales/L15/CONG/BOCG/B/BOCG-15-B-336-2.PDF",
+"press": "https://www.elespanol.com/espana/20260910/gobierno-bloquea-jubilacion-anticipada-policia-guardia-civil-coste-arcas-publicas/1003744379538_0.html",
+"ctx": "Ertzaintza, Mossos, Policía Foral y policías locales ya tienen este adelanto de la jubilación; la Policía Nacional y la Guardia Civil, no.",
+"topic": "Pensiones",
+"check": "oficial"
+},
+{
+"id": "66",
+"short": "Contar aparte el voto por correo",
+"group": "opo",
+"party": "Vox",
+"text": "Contar los votos por correo por separado de los presenciales y publicar sus resultados aparte en el acta de cada mesa, y obligar a quien vota por correo a entregarlo en persona con el DNI.",
+"trade": "Sus críticos decían que no hay pruebas de fraude en el voto por correo en España y que contarlo aparte en mesas con pocos votos podría revelar a quién ha votado cada persona.",
+"who": "Proposición de ley orgánica · Vox",
+"how": "vet",
+"date": "09/2025",
+"stop": [
+"PSOE",
+"Sumar"
+],
+"stopTxt": "El Gobierno (PSOE y Sumar), por su impacto presupuestario",
+"why": "Disconformidad presupuestaria (art. 134.6 de la Constitución).",
+"after": "No llegó a debatirse.",
+"src": "https://www.congreso.es/public_oficiales/L15/CONG/BOCG/B/BOCG-15-B-239-2.PDF",
+"press": "",
+"ctx": "Hoy los votos por correo se meten en la misma urna que los presenciales antes de empezar el recuento, por lo que no se sabe por separado qué se votó por correo.",
+"topic": "Instituciones y transparencia",
+"check": "oficial"
+},
+{
+"id": "67",
+"short": "Que la Seguridad Social pague toda la cotización en las bajas por nacimiento",
+"group": "opo",
+"party": "Vox",
+"text": "Volver a bonificar el 100 % de la cotización de la empresa mientras un trabajador está de baja por nacimiento y cuidado de un hijo y es sustituido por otro, en lugar de la ayuda fija de 366 euros al mes que hay desde 2023.",
+"trade": "Sus críticos decían que costaba dinero a la Seguridad Social en un momento de déficit y que la ayuda fija ya cubre la mayor parte de la cotización en los sueldos más bajos.",
+"who": "Proposición de ley · Vox",
+"how": "vet",
+"date": "05/2025",
+"stop": [
+"PSOE",
+"Sumar"
+],
+"stopTxt": "El Gobierno (PSOE y Sumar), por su impacto presupuestario",
+"why": "Disconformidad presupuestaria (art. 134.6 de la Constitución).",
+"after": "No llegó a debatirse. Al ampliar los permisos por nacimiento en 2025, el Gobierno mantuvo la ayuda fija de 366 euros.",
+"src": "https://www.congreso.es/public_oficiales/L15/CONG/BOCG/B/BOCG-15-B-194-2.PDF",
+"press": "https://www.esdiario.com/nacional/261104/202096/permisos-gastos-pymes-soportan-factura-reformas-sanchez.html",
+"ctx": "Hasta septiembre de 2023, si la empresa contrataba a alguien para sustituir a quien estaba de baja por nacimiento, la Seguridad Social le bonificaba toda la cotización del trabajador de baja. Desde entonces bonifica una cantidad fija de 366 euros al mes.",
+"topic": "Familias y servicios sociales",
+"check": "oficial"
+},
+{
+"id": "68",
+"short": "Sin padrón para okupas ni para quien está en España de forma irregular",
+"group": "opo",
+"party": "Vox",
+"text": "Que para empadronarse en una vivienda haya que presentar el título que da derecho a vivir en ella (propiedad, alquiler…) o la autorización de quien lo tiene, y que las inscripciones sin ese título sean nulas y no den ningún derecho. Además, que en el padrón conste expresamente si la persona está en España de forma irregular.",
+"trade": "Sus críticos decían que el padrón solo registra dónde vive alguien y es la puerta a derechos básicos como la sanidad o la escuela, que la ley ya permite pedir documentación de la vivienda y dar de baja a extranjeros sin residencia, y que la propuesta asociaba inmigración y delincuencia.",
+"who": "Proposición de ley · Vox",
+"how": "vot",
+"date": "18/02/2025",
+"stop": [
+"CC",
+"PSOE",
+"Sumar",
+"Junts",
+"UPN",
+"ERC",
+"Bildu",
+"PNV",
+"Podemos"
+],
+"stopTxt": "PSOE, Sumar, ERC, Junts, Bildu, PNV, Podemos, Coalición Canaria y UPN (174 en contra, 169 a favor, sin abstenciones). Solo PP y Vox votaron a favor, más un diputado del PSOE. Con que Junts se hubiera abstenido, habría salido adelante.",
+"why": "PNV: el reglamento del padrón ya permite pedir el título de la vivienda y dar de baja a quien no cumple los requisitos; una propuesta idéntica de Vox ya se rechazó en 2022. ERC: empadronarse es un derecho, no un privilegio, como reconoce el Tribunal Constitucional. PSOE: la consideró una propuesta racista; el padrón sirve para integrar y no criminalizar a los más vulnerables. Sumar: pidió ampliar la regularización de inmigrantes, no restringirla (Diario de Sesiones PL-96).",
+"after": "Rechazada su tramitación.",
+"src": "https://www.congreso.es/public_oficiales/L15/CONG/BOCG/B/BOCG-15-B-47-1.PDF",
+"press": "",
+"ctx": "El padrón municipal registra a todas las personas que viven en un municipio, tengan o no papeles. Estar empadronado da acceso a servicios como la sanidad, la escolarización o los servicios sociales, y es una de las pruebas para pedir el arraigo. Las inscripciones de extranjeros sin residencia permanente ya deben renovarse cada dos años.",
+"topic": "Inmigración",
+"check": "oficial"
+}
+];
+const HOW = {vot:"Votada en contra", mesa:"Congelada sin votar", vet:"Vetada"};
+const GROUP = {gob:"Partidos del Gobierno (PSOE · Sumar)", opo:"Oposición (PP · Vox)"};
+const MAIN = ["PSOE","Sumar","PP","Vox"];
+
+let K = 10, deck = [], i = 0, votes = {};
+const $ = s => document.querySelector(s);
+const shuffle = a => { a = a.slice(); for (let k = a.length - 1; k > 0; k--) { const j = Math.floor(Math.random() * (k + 1)); [a[k], a[j]] = [a[j], a[k]]; } return a; };
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+document.querySelectorAll('.length .opt').forEach(b => b.onclick = () => {
+  document.querySelectorAll('.length .opt').forEach(x => x.setAttribute('aria-pressed', 'false'));
+  b.setAttribute('aria-pressed', 'true'); K = b.dataset.k === 'all' ? 'all' : +b.dataset.k;
+});
+
+function start() {
+  if (K === 'all') deck = shuffle(M);
+  else {
+    const pick = g => {
+      const pool = shuffle(M.filter(m => m.group === g)), out = [], seen = new Set();
+      for (const m of pool) if (out.length < K && !seen.has(m.topic)) { out.push(m); seen.add(m.topic); }
+      for (const m of pool) if (out.length < K && !out.includes(m)) out.push(m);
+      return out;
+    };
+    deck = shuffle([...pick('gob'), ...pick('opo')]);
+  }
+  i = 0; votes = {};
+  show('quiz'); render();
+}
+function show(s) { ['start', 'quiz', 'results'].forEach(x => $('#s-' + x).classList.toggle('hidden', x !== s)); window.scrollTo(0, 0); }
+function render() {
+  const m = deck[i];
+  $('#counter').textContent = `Medida ${i + 1} de ${deck.length}`;
+  $('#prog').style.width = (i / deck.length * 100) + '%';
+  $('#m-topic').textContent = m.topic || '';
+  $('#m-text').textContent = m.text;
+  $('#m-trade').textContent = 'A tener en cuenta: ' + m.trade;
+  $('#m-ctx').textContent = m.ctx || '';
+  $('#m-ctx').classList.add('hidden');
+  $('#more').classList.toggle('hidden', !m.ctx);
+  $('#more').textContent = 'Saber más sobre esta medida';
+  document.querySelectorAll('.choice').forEach(c => c.classList.toggle('sel', votes[m.id] === c.dataset.v));
+  if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+  $('#back').textContent = i === 0 ? '← Volver a la introducción' : '← Anterior';
+}
+function go(dir) {
+  const card = $('#qcard'); $('#choices').classList.add('lock');
+  card.classList.add(dir > 0 ? 'out' : 'in');
+  setTimeout(() => {
+    i += dir;
+    if (i >= deck.length) { $('#choices').classList.remove('lock'); card.className = 'card'; return results(); }
+    render();
+    card.classList.remove('out', 'in'); card.classList.add(dir > 0 ? 'in' : 'out');
+    requestAnimationFrame(() => requestAnimationFrame(() => { card.classList.remove('in', 'out'); }));
+    setTimeout(() => $('#choices').classList.remove('lock'), 250);
+  }, 230);
+}
+document.querySelectorAll('.choice').forEach(b => b.onclick = () => {
+  if ($('#choices').classList.contains('lock')) return;
+  votes[deck[i].id] = b.dataset.v;
+  document.querySelectorAll('.choice').forEach(c => c.classList.toggle('sel', c === b));
+  $('#choices').classList.add('lock');
+  setTimeout(() => go(1), 280);
+});
+$('#back').onclick = () => { if (i > 0) { go(-1); } else { show('start'); } };
+$('#more').onclick = () => {
+  const h = $('#m-ctx').classList.toggle('hidden');
+  $('#more').textContent = h ? 'Saber más sobre esta medida' : 'Ocultar';
+};
+
+const pct = (n, d) => d ? Math.round(n / d * 100) : 0;
+const row = (label, n, d, color) => `<div class="row"><span>${esc(label)}</span><span class="track"><i style="width:${pct(n, d)}%;${color ? 'background:' + color : ''}"></i></span><span class="n">${n} de ${d}</span></div>`;
+
+function results() {
+  show('results');
+  const yes = deck.filter(m => votes[m.id] === 'si');
+  const no = deck.filter(m => votes[m.id] === 'no');
+  const meh = deck.filter(m => votes[m.id] === 'igual');
+  const duda = deck.filter(m => votes[m.id] === 'duda');
+  const chip = (t, cls) => `<span class="chip ${cls || ''}">${esc(t)}</span>`;
+  const proposers = m => MAIN.filter(p => m.party.includes(p));
+  const list = arr => arr.map(m => `<div class="mrow"><span class="t">${esc(m.short)}</span></div>`).join('');
+  const detail = m => `<div class="small" style="margin:8px 0 4px">
+      <p><b>Propuesta:</b> ${esc(m.who)} · ${esc(m.date)}</p>
+      <p><b>La frenó:</b> ${esc(m.stopTxt)}</p>
+      <p><b>Motivo que dieron:</b> ${esc(m.why)}</p>
+      <p><b>Qué pasó después:</b> ${esc(m.after)}</p>
+      <p>${m.src ? `<a href="${esc(m.src)}" target="_blank" rel="noopener">Documento oficial</a>` : '<span class="tag warn">sin documento oficial aún</span>'}${m.press ? ` · <a href="${esc(m.press)}" target="_blank" rel="noopener">Noticia</a>` : ''}${m.check === 'partido' ? ' <span class="tag warn">por verificar · fuente del partido</span>' : ''}</p>
+    </div>`;
+  const item = m => { return `<details class="mrow" style="display:block"><summary style="cursor:pointer;list-style:none">
+      <span class="t">${esc(m.short)}</span><br>
+      <span class="who">${proposers(m).map(p => chip(p, 'p')).join('')} <span class="tag ${m.how}">${HOW[m.how].toLowerCase()}</span> por ${m.stop.map(p => chip(p)).join('')} <span class="small vermas">ver motivo y fuentes ▾</span></span>
+    </summary>${detail(m)}</details>`; };
+  let h = `<h2>¿Quién propuso lo que elegiste?</h2>
+    <p class="lead">Te habría gustado que se hubieran aprobado <strong>${yes.length} de ${deck.length}</strong> medidas.</p>
+    <p class="small">En <span class="chip p">negro</span> los partidos que la propusieron; en <span class="chip">blanco</span> los partidos que la frenaron.</p>
+    <p class="small"><span class="tag vot">Votada en contra</span> la mayoría votó que no · <span class="tag mesa">Congelada sin votar</span> la Mesa del Congreso alargó el plazo de enmiendas una y otra vez y nunca se votó · <span class="tag vet">Vetada</span> el Gobierno la bloqueó alegando que cambiaba el presupuesto.</p>`;
+  if (yes.length) {
+    h += `<h3>Las que te habría gustado que se aprobasen</h3>${yes.map(item).join('')}`;
+    const both = new Set(yes.map(m => m.group)).size > 1;
+    h += `<p style="margin-top:12px">${both
+      ? 'Te han gustado medidas <strong>de los dos lados</strong>. Ningún partido tenía mayoría: para aprobarlas habría hecho falta que pactaran entre ellos.'
+      : 'Todas las que te gustaron vienen del mismo lado. Prueba otra vez: el sorteo te sacará medidas distintas.'}</p>`;
+  }
+  if (no.length) h += `<h3>Las que no querías que se aprobasen</h3><p class="small muted">Aquí el resultado fue el que preferías.</p>${no.map(item).join('')}`;
+  if (duda.length) h += `<h3>Las que te importan pero no tienes claro si había que aprobar o no</h3><p class="small muted">Pulsa en cada una para ver qué se dijo a favor y en contra. Son buenas para hablarlas con alguien.</p>${duda.map(item).join('')}`;
+  if (meh.length) h += `<h3>Las que no te parecen relevantes</h3><p class="small muted">¿Qué temas te gustaría que ocuparan al Congreso?</p>${meh.map(item).join('')}`;
+  $('#summary').innerHTML = h;
+  // Los tres relatos del principio, contrastados con datos
+  const gob = deck.filter(m => m.group === 'gob'), opo = deck.filter(m => m.group === 'opo');
+  const gobSocios = gob.filter(m => m.stop.some(p => !['PP', 'Vox'].includes(p))).length;
+  const opoMesa = opo.filter(m => m.how === 'mesa').length;
+  $('#relatos').innerHTML = `<h3>¿Han matado los datos a los tres relatos del principio?</h3>
+    <p>No del todo: ninguno es del todo verdad ni del todo mentira. Esto dicen los datos:</p>
+    <p><strong>«El Gobierno no ha hecho nada.»</strong><br><span>En la legislatura se aprobaron 37 leyes y más de 50 decretos-ley siguieron en vigor. Pero también se le cayeron muchas iniciativas propias: al menos 12 decretos tumbados en el Congreso y una veintena de proyectos de ley congelados, algunos por su propia mayoría en la Mesa.</span></p>
+    <p><strong>«La oposición lo bloquea todo.»</strong><br><span>Muchas medidas del Gobierno cayeron porque sus propios socios, o incluso su propia mayoría en la Mesa, las frenaron. ${gob.length ? `De las ${gob.length} del lado del Gobierno que has visto, en <strong>${gobSocios}</strong> de ellas ayudaron a frenarla partidos distintos de PP y Vox.` : ''}</span></p>
+    <p><strong>«Nos han frenado todas nuestras propuestas.»</strong><br><span>Es verdad en buena parte: 44 de las 47 proposiciones de ley que el Senado envió al Congreso se quedaron congeladas sin votarse. Pero otras propuestas de la oposición se votaron y perdieron, y algunas cayeron por la abstención de otro partido de la oposición. ${opo.length ? `De las ${opo.length} de la oposición que has visto, <strong>${opoMesa}</strong> se congelaron; el resto se votó o se vetó.` : ''}</span></p>
+    <div class="ctx" style="margin-top:14px"><strong>La próxima vez que oigas en la mesa de un bar, veas en redes sociales o leas en un titular un «todo», «nada» o «siempre»</strong>, pregúntate:
+      <ol style="margin:.4em 0 0 1.1em;padding:0"><li>¿Qué dato lo respalda y de dónde sale?</li><li>¿Qué parte es verdad y qué deja fuera?</li><li>¿Quién lo dice y qué gana diciéndolo?</li></ol></div>`;
+}
+
+
+// Hemiciclo: escaños tras las elecciones de julio de 2023, de izquierda a derecha en el hemiciclo
+const SEATS = [["Sumar",31,"#c0267a"],["Bildu",6,"#c9d634"],["ERC",7,"#e8a33d"],["BNG",1,"#7fb3d5"],["PSOE",121,"#d9262e"],["PNV",5,"#245c34"],["Junts",7,"#2bb3a6"],["CC",1,"#f2c94c"],["UPN",1,"#5b7db1"],["PP",137,"#1d5fbf"],["Vox",33,"#5aa02c"]];
+function drawHemi() {
+  const total = 350, rows = 12, R = 1, r0 = 0.38, W = 360, H = 196, pad = 8;
+  const radii = Array.from({length: rows}, (_, k) => r0 + (R - r0) * k / (rows - 1));
+  const sum = radii.reduce((a, b) => a + b, 0);
+  let counts = radii.map(r => Math.round(total * r / sum));
+  let diff = total - counts.reduce((a, b) => a + b, 0); counts[rows - 1] += diff;
+  const pts = [];
+  radii.forEach((r, k) => { const n = counts[k]; for (let j = 0; j < n; j++) { const a = Math.PI * (1 - j / (n - 1)); pts.push({a, x: r * Math.cos(a), y: r * Math.sin(a)}); } });
+  pts.sort((p, q) => q.a - p.a);
+  const cols = []; SEATS.forEach(([n, c, col]) => { for (let i = 0; i < c; i++) cols.push(col); });
+  const sc = (W / 2 - pad), dot = sc * (R - r0) / (rows - 1) * 0.42;
+  const circles = pts.map((p, i) => `<circle cx="${(W / 2 + p.x * sc).toFixed(1)}" cy="${(H - pad - p.y * sc).toFixed(1)}" r="${dot.toFixed(2)}" fill="${cols[i]}"/>`).join('');
+  $('#hemi').innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:420px;display:block;margin:10px auto">${circles}<text x="${W/2}" y="${H-pad-6}" text-anchor="middle" font-size="22" font-weight="700" fill="#1d1b18" font-family="Georgia, serif">350</text><text x="${W/2}" y="${H-pad+5}" text-anchor="middle" font-size="9" fill="#6b665e">mayoría absoluta: 176</text></svg>`;
+  $('#hemi-legend').innerHTML = SEATS.map(([n, c, col]) => `<span style="white-space:nowrap;margin-right:10px"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${col};margin-right:4px;vertical-align:middle"></span>${n} ${c}</span>`).join(' ');
+}
+drawHemi();
+$('#go').onclick = start;
+$('#again').onclick = () => show('start');
+</script>
 </body>
 </html>
